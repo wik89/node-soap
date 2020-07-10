@@ -3,13 +3,13 @@
  * MIT Licensed
  */
 
-import { EventEmitter } from 'events';
+import {EventEmitter} from 'events';
 import * as http from 'http';
 import * as url from 'url';
-import { IOneWayOptions, ISecurity, IServerOptions, IServices, ISoapFault, ISoapServiceMethod } from './types';
-import { findPrefix } from './utils';
-import { WSDL } from './wsdl';
-import { BindingElement, IPort } from './wsdl/elements';
+import {IOneWayOptions, ISecurity, IServerOptions, IServices, ISoapFault, ISoapServiceMethod} from './types';
+import {findPrefix} from './utils';
+import {WSDL} from './wsdl';
+import {BindingElement, IPort} from './wsdl/elements';
 
 let zlib;
 try {
@@ -38,6 +38,7 @@ function getDateString(d) {
   function pad(n) {
     return n < 10 ? '0' + n : n;
   }
+
   return d.getUTCFullYear() + '-'
     + pad(d.getUTCMonth() + 1) + '-'
     + pad(d.getUTCDate()) + 'T'
@@ -50,13 +51,17 @@ function getDateString(d) {
 // tslint:disable-next-line:interface-name
 export interface Server {
   emit(event: 'request', request: any, methodName: string): boolean;
+
   emit(event: 'headers', headers: any, methodName: string): boolean;
+
   emit(event: 'response', headers: any, methodName: string): boolean;
 
   /** Emitted for every received messages. */
   on(event: 'request', listener: (request: any, methodName: string) => void): this;
+
   /** Emitted when the SOAP Headers are not empty. */
   on(event: 'headers', listener: (headers: any, methodName: string) => void): this;
+
   /** Emitted before sending SOAP response. */
   on(event: 'response', listener: (response: any, methodName: string) => void): this;
 }
@@ -101,7 +106,8 @@ export class Server extends EventEmitter {
     this.onewayOptions = options && options.oneWay || {};
     this.enableChunkedEncoding =
       options.enableChunkedEncoding === undefined ? true : !!options.enableChunkedEncoding;
-    this.callback = options.callback ? options.callback : () => { };
+    this.callback = options.callback ? options.callback : () => {
+    };
     if (path[path.length - 1] !== '/') {
       path += '/';
     }
@@ -173,29 +179,29 @@ export class Server extends EventEmitter {
 
   private _processSoapHeader(soapHeader, name, namespace, xmlns) {
     switch (typeof soapHeader) {
-    case 'object':
-      return this.wsdl.objectToXML(soapHeader, name, namespace, xmlns, true);
-    case 'function':
-      const _this = this;
-      // arrow function does not support arguments variable
-      // tslint:disable-next-line
-      return function() {
-        const result = soapHeader.apply(null, arguments);
+      case 'object':
+        return this.wsdl.objectToXML(soapHeader, name, namespace, xmlns, true);
+      case 'function':
+        const _this = this;
+        // arrow function does not support arguments variable
+        // tslint:disable-next-line
+        return function () {
+          const result = soapHeader.apply(null, arguments);
 
-        if (typeof result === 'object') {
-          return _this.wsdl.objectToXML(result, name, namespace, xmlns, true);
-        } else {
-          return result;
-        }
-      };
-    default:
-      return soapHeader;
+          if (typeof result === 'object') {
+            return _this.wsdl.objectToXML(result, name, namespace, xmlns, true);
+          } else {
+            return result;
+          }
+        };
+      default:
+        return soapHeader;
     }
   }
 
   private _initializeOptions(options: IServerOptions) {
     this.wsdl.options.attributesKey = options.attributesKey || 'attributes';
-    this.onewayOptions.statusCode = this.onewayOptions.responseCode || 200;
+    this.onewayOptions.statusCode = this.onewayOptions.responseCode || 200;
     this.onewayOptions.emptyBody = !!this.onewayOptions.emptyBody;
   }
 
@@ -291,10 +297,12 @@ export class Server extends EventEmitter {
     let serviceName: string;
     let portName: string;
     const includeTimestamp = obj.Header && obj.Header.Security && obj.Header.Security.Timestamp;
-    const authenticate = this.authenticate || function defaultAuthenticate() { return true; };
+    const authenticate = this.authenticate || function defaultAuthenticate() {
+      return true;
+    };
 
     const callback = (result, statusCode) => {
-      const response = { result: result };
+      const response = {result: result};
       this.emit('response', response, methodName);
       cb(response.result, statusCode);
     };
@@ -408,9 +416,9 @@ export class Server extends EventEmitter {
           return this._sendError({
             Code: {
               Value: 'SOAP-ENV:Server',
-              Subcode: { value: 'InternalServerError' },
+              Subcode: {value: 'InternalServerError'},
             },
-            Reason: { Text: authResult.toString() },
+            Reason: {Text: authResult.toString()},
             statusCode: 500,
           }, callback, includeTimestamp);
         }
@@ -427,9 +435,9 @@ export class Server extends EventEmitter {
               return this._sendError({
                 Code: {
                   Value: 'SOAP-ENV:Server',
-                  Subcode: { value: 'InternalServerError' },
+                  Subcode: {value: 'InternalServerError'},
                 },
-                Reason: { Text: error.toString() },
+                Reason: {Text: error.toString()},
                 statusCode: 500,
               }, callback, includeTimestamp);
             }
@@ -437,9 +445,9 @@ export class Server extends EventEmitter {
             return this._sendError({
               Code: {
                 Value: 'SOAP-ENV:Client',
-                Subcode: { value: 'AuthenticationFailure' },
+                Subcode: {value: 'AuthenticationFailure'},
               },
-              Reason: { Text: 'Invalid username or password' },
+              Reason: {Text: 'Invalid username or password'},
               statusCode: 401,
             }, callback, includeTimestamp);
           }
@@ -509,16 +517,16 @@ export class Server extends EventEmitter {
           return this._sendError({
             Code: {
               Value: 'SOAP-ENV:Server',
-              Subcode: { value: 'InternalServerError' },
+              Subcode: {value: 'InternalServerError'},
             },
-            Reason: { Text: error.toString() },
+            Reason: {Text: error.toString()},
             statusCode: 500,
           }, callback, includeTimestamp);
         }
       }
 
       if (style === 'rpc') {
-        body = this.wsdl.objectToRpcXML(outputName, result, '', this.wsdl.definitions.$targetNamespace);
+        body = this.wsdl.objectToRpcXML(outputName, result, '', this.wsdl.definitions.$targetNamespac, true);
       } else {
         const element = this.wsdl.definitions.services[serviceName].ports[portName].binding.methods[methodName].output;
         body = this.wsdl.objectToDocumentXML(outputName, result, element.targetNSAlias, element.targetNamespace);
