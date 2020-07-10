@@ -587,7 +587,7 @@ export class WSDL {
       }
       if (key !== nsAttrName) {
         const value = params[key];
-        const prefixedKey = (isParts ? '' : nsPrefix) + key;
+        const prefixedKey = (isParts ? '' : '') + key;
         const attributes = [];
         if (typeof value === 'object' && value.hasOwnProperty(this.options.attributesKey)) {
           const attrs = value[this.options.attributesKey];
