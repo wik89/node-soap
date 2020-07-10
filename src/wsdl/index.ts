@@ -574,7 +574,6 @@ export class WSDL {
     const parts = [];
     const defs = this.definitions;
     const nsAttrName = '_xmlns';
-    console.log({name, params, nsPrefix, nsURI, isParts});
     nsPrefix = nsPrefix || findPrefix(defs.xmlns, nsURI);
 
     nsURI = nsURI || defs.xmlns[nsPrefix];
