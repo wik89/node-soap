@@ -526,7 +526,7 @@ export class Server extends EventEmitter {
       }
 
       if (style === 'rpc') {
-        body = this.wsdl.objectToRpcXML(outputName, result, '', this.wsdl.definitions.$targetNamespac, true);
+        body = this.wsdl.objectToRpcXML(outputName, result, '', this.wsdl.definitions.$targetNamespace, true);
       } else {
         const element = this.wsdl.definitions.services[serviceName].ports[portName].binding.methods[methodName].output;
         body = this.wsdl.objectToDocumentXML(outputName, result, element.targetNSAlias, element.targetNamespace);
