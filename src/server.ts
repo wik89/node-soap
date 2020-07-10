@@ -571,10 +571,8 @@ export class Server extends EventEmitter {
       ? 'http://www.w3.org/2003/05/soap-envelope'
       : 'http://schemas.xmlsoap.org/soap/envelope/';
 
-    let xml = '<?xml version="1.0" encoding="utf-8"?>' +
-      '<soap:Envelope xmlns:soap="' + envelopeDefinition + '" ' +
-      encoding +
-      this.wsdl.xmlnsInEnvelope + '>';
+    let xml = '<?xml version="1.0" encoding="UTF-8"?>' +
+      '<SOAP-ENV:Envelope' + this.wsdl.xmlnsInEnvelope + ' SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">';
 
     headers = headers || '';
 
@@ -594,12 +592,12 @@ export class Server extends EventEmitter {
     }
 
     if (headers !== '') {
-      xml += '<soap:Header>' + headers + '</soap:Header>';
+      xml += '<SOAP-ENV:Header>' + headers + '</SOAP-ENV:Header>';
     }
 
-    xml += body ? '<soap:Body>' + body + '</soap:Body>' : '<soap:Body/>';
+    xml += body ? '<SOAP-ENV:Body>' + body + '</SOAP-ENV:Body>' : '<SOAP-ENV:Body/>';
 
-    xml += '</soap:Envelope>';
+    xml += '</SOAP-ENV:Envelope>';
     return xml;
   }
 

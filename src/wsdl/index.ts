@@ -574,7 +574,7 @@ export class WSDL {
     const parts = [];
     const defs = this.definitions;
     const nsAttrName = '_xmlns';
-
+    console.log({name, params, nsPrefix, nsURI, isParts});
     nsPrefix = nsPrefix || findPrefix(defs.xmlns, nsURI);
 
     nsURI = nsURI || defs.xmlns[nsPrefix];
@@ -1270,10 +1270,18 @@ export class WSDL {
     const xmlns = this.definitions.xmlns;
     let str = '';
     for (const alias in xmlns) {
+
       if (alias === '' || alias === TNS_PREFIX) {
         continue;
       }
       const ns = xmlns[alias];
+      switch (alias) {
+        case 'soap':
+        case 'wsdl':
+        case 'soapenc':
+          continue;
+      }
+      /*
       switch (ns) {
         case 'http://xml.apache.org/xml-soap' : // apachesoap
         case 'http://schemas.xmlsoap.org/wsdl/' : // wsdl
@@ -1291,7 +1299,7 @@ export class WSDL {
       }
       if (~ns.indexOf('http://xml.apache.org/')) {
         continue;
-      }
+      }*/
       str += ' xmlns:' + alias + '="' + ns + '"';
     }
     return str;
